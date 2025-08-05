@@ -281,13 +281,12 @@ export const guest = (() => {
     const data = new URLSearchParams({
       action: "TEMPLATE",
       text: "The Wedding of Wahyu and Riski",
-      dates: `${formatDate("2023-03-15 10:00")}/${formatDate(
-        "2023-03-15 11:00"
+      dates: `${formatDate("2025-10-26 11:00")}/${formatDate(
+        "2025-10-26 12:00"
       )}`,
       details:
-        "Tanpa mengurangi rasa hormat, kami mengundang Anda untuk berkenan menghadiri acara pernikahan kami. Terima kasih atas perhatian dan doa restu Anda, yang menjadi kebahagiaan serta kehormatan besar bagi kami.",
-      location:
-        "RT 10 RW 02, Desa Pajerukan, Kec. Kalibagor, Kab. Banyumas, Jawa Tengah 53191.",
+        "Với tất cả sự trân trọng, chúng tôi trân trọng kính mời quý vị đến dự lễ cưới của chúng tôi. Xin chân thành cảm ơn sự quan tâm và chúc phúc của quý vị, đây là niềm vui và vinh dự lớn lao cho chúng tôi",
+      location: "Nhà hàng ngân trình 2, xã Vạn An, tỉnh Nghệ An",
       ctz: config.get("tz"),
     });
 
