@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# wedding
-Đám cưới Trung Hiếu - Khánh Ly
-=======
 # 💌 Template website undangan pernikahan sederhana
 
 ![Thumbnail](/assets/images/banner.webp)
@@ -12,20 +8,21 @@
 [![GitHub License](https://img.shields.io/github/license/dewanakl/undangan?color=brightgreen)](https://shields.io)
 
 ## 🚀 Demo
+
 Untuk kamu yang ingin melihat demo terlebih dahulu:
 
 [https://ulems.my.id/?to=Teman teman semua](https://ulems.my.id/?to=Teman%20teman%20semua)
 
 ## 📦 Documentation
 
-* Jalankan perintah `npm install`, lalu `npm run dev`, dan buka `http://localhost:8080`.
-* Ubah isi file `index.html` sesuai keinginanmu.
-* Jika tidak ingin menggunakan **fitur komentar**, hapus atribut `data-url` dan `data-key` di elemen `<body>` pada index.html.
-* Sesuaikan `data-url` pada `<body>` di index dan dashboard sesuai dengan URL backend (jika kamu meng-hosting sendiri).
-* Sesuaikan juga `data-key` di index dengan access key yang bisa kamu ambil dari dashboard.
-* Jika ingin menggunakan GIF, dapatkan Tenor API key di [developers.google.com/tenor](https://developers.google.com/tenor/guides/quickstart).
-* Untuk deployment, jalankan `npm run build:public`. Folder `public` adalah yang akan kamu upload.
-* Untuk backend self-hosting, lihat penjelasan di bawah, atau gunakan **trial API** secara gratis.
+- Jalankan perintah `npm install`, lalu `npm run dev`, dan buka `http://localhost:8080`.
+- Ubah isi file `index.html` sesuai keinginanmu.
+- Jika tidak ingin menggunakan **fitur komentar**, hapus atribut `data-url` dan `data-key` di elemen `<body>` pada index.html.
+- Sesuaikan `data-url` pada `<body>` di index dan dashboard sesuai dengan URL backend (jika kamu meng-hosting sendiri).
+- Sesuaikan juga `data-key` di index dengan access key yang bisa kamu ambil dari dashboard.
+- Jika ingin menggunakan GIF, dapatkan Tenor API key di [developers.google.com/tenor](https://developers.google.com/tenor/guides/quickstart).
+- Untuk deployment, jalankan `npm run build:public`. Folder `public` adalah yang akan kamu upload.
+- Untuk backend self-hosting, lihat penjelasan di bawah, atau gunakan **trial API** secara gratis.
 
 > Undangan ini hanya menggunakan HTML, CSS, dan JavaScript biasa. NPM digunakan agar file JavaScript bisa langsung dieksekusi (bukan bertipe module lagi).
 
@@ -39,12 +36,13 @@ Untuk kamu yang ingin melihat demo terlebih dahulu:
 ## 🔥 Deployment API
 
 - Video\
-    otw
+   otw
 
 - Presentation
-    [https://docs.google.com/presentation](https://docs.google.com/presentation/d/1EY2YmWdZUI7ASoo0f2wvU7ec_Yt0uZanYa8YLbfNysk/edit)
+  [https://docs.google.com/presentation](https://docs.google.com/presentation/d/1EY2YmWdZUI7ASoo0f2wvU7ec_Yt0uZanYa8YLbfNysk/edit)
 
 ## ⏰ Trial API
+
 Untuk kamu yang ingin mencoba secara gratis:
 
 [https://trial.ulems.my.id](https://trial.ulems.my.id)
@@ -59,6 +57,7 @@ Untuk kamu yang ingin mencoba secara gratis:
 - Vanilla JS
 
 ## 🎨 Credit
+
 All visual assets in this project are sourced from Pixabay.
 
 ## 🤝 Contributing
@@ -72,4 +71,3 @@ If you find any security vulnerabilities in this undangan, please email DKL via 
 ## 📜 License
 
 Undangan is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
->>>>>>> 4.x
