@@ -1,44 +1,77 @@
 import { progress } from "./progress.js";
 import { util } from "../../common/util.js";
-import { cache } from "../../connection/cache.js";
 
 export const audio = (() => {
   const statePlay = '<i class="fa-solid fa-circle-pause spin-button"></i>';
   const statePause = '<i class="fa-solid fa-circle-play"></i>';
 
   /**
+   * Tải bài hát với timeout
+   * @param {string} url
+   * @returns {Promise<HTMLAudioElement|null>}
+   */
+  const loadTrack = (url) =>
+    new Promise((resolve) => {
+      const timeout = setTimeout(() => {
+        console.warn(`Timeout loading audio: ${url}`);
+        resolve(null); // Bỏ qua bài hát nếu timeout
+      }, 10000); // Timeout sau 5 giây
+
+      const audioElement = new Audio(url);
+      audioElement.loop = false;
+      audioElement.muted = false;
+      audioElement.autoplay = false;
+      audioElement.controls = false;
+
+      audioElement.addEventListener(
+        "loadedmetadata",
+        () => {
+          clearTimeout(timeout);
+          resolve(audioElement);
+        },
+        { once: true }
+      );
+
+      audioElement.addEventListener(
+        "error",
+        () => {
+          console.error("Error loading audio:", url);
+          clearTimeout(timeout);
+          resolve(null); // Bỏ qua bài hát nếu lỗi
+        },
+        { once: true }
+      );
+    });
+
+  /**
+   * Tải danh sách bài hát
    * @param {boolean} [playOnOpen=true]
    * @returns {Promise<void>}
    */
   const load = async (playOnOpen = true) => {
-    // Lấy danh sách bài hát từ data-audios
     const audioUrls = document.body
       .getAttribute("data-audios")
       ?.split(",")
       .map((url) => url.trim());
     if (!audioUrls || audioUrls.length === 0) {
+      console.log("No audio URLs provided, skipping audio");
       progress.complete("audio", true);
       return;
     }
 
-    /**
-     * @type {HTMLAudioElement|null}
-     */
+    const music = document.getElementById("button-music");
     let audioEl = null;
-    let currentTrackIndex = Math.floor(Math.random() * audioUrls.length); // Chọn bài ngẫu nhiên ban đầu
-    let isPlay = false; // Khai báo isPlay ở đây để tất cả hàm con có thể truy cập
+    let currentTrackIndex = Math.floor(Math.random() * audioUrls.length);
+    let isPlay = false;
+    let attempts = 0;
 
     /**
      * Phát bài hát
-     * @returns {Promise<void>}
      */
-
-    const music = document.getElementById("button-music");
     const play = async () => {
       if (!navigator.onLine || !music || !audioEl) {
         return;
       }
-
       music.disabled = true;
       try {
         await audioEl.play();
@@ -47,50 +80,13 @@ export const audio = (() => {
         music.innerHTML = statePlay;
       } catch (err) {
         isPlay = false;
-        util.notify(err).error();
+        console.error("Error playing audio:", err);
+        util.notify("Không thể phát nhạc, vui lòng thử lại.").error();
       }
     };
-
-    /**
-     * Tải bài hát từ URL
-     * @param {string} url
-     * @returns {Promise<void>}
-     */
-    const loadTrack = async (url) => {
-      try {
-        audioEl = new Audio(
-          await cache("audio").withForceCache().get(url, progress.getAbort())
-        );
-        audioEl.loop = false; // Tắt loop để chuyển bài khi kết thúc
-        audioEl.muted = false;
-        audioEl.autoplay = false;
-        audioEl.controls = false;
-
-        // Sự kiện khi bài hát kết thúc
-        audioEl.addEventListener("ended", () => {
-          // Chọn bài ngẫu nhiên khác
-          currentTrackIndex = Math.floor(Math.random() * audioUrls.length);
-          loadTrack(audioUrls[currentTrackIndex]).then(() => {
-            if (isPlay) {
-              // Thêm {} để tuân thủ ESLint
-              play();
-            }
-          });
-        });
-
-        progress.complete("audio");
-      } catch {
-        progress.invalid("audio");
-        return;
-      }
-    };
-
-    // Tải bài hát đầu tiên
-    await loadTrack(audioUrls[currentTrackIndex]);
 
     /**
      * Tạm dừng bài hát
-     * @returns {void}
      */
     const pause = () => {
       if (audioEl) {
@@ -99,6 +95,50 @@ export const audio = (() => {
         music.innerHTML = statePause;
       }
     };
+
+    // Thử tải bài hát cho đến khi thành công hoặc hết danh sách
+    while (attempts < audioUrls.length && !audioEl) {
+      audioEl = await loadTrack(audioUrls[currentTrackIndex]);
+      attempts += 1;
+      if (!audioEl) {
+        console.warn(`Skipping audio at index ${currentTrackIndex}`);
+        currentTrackIndex = (currentTrackIndex + 1) % audioUrls.length; // Thử bài tiếp theo
+      }
+    }
+
+    if (!audioEl) {
+      console.warn("All audio tracks failed to load, skipping audio");
+      progress.complete("audio", true);
+      return;
+    }
+
+    // Gọi progress.complete khi tải thành công một bài hát
+    progress.complete("audio");
+
+    // Xử lý khi bài hát kết thúc
+    audioEl.addEventListener("ended", async () => {
+      currentTrackIndex = Math.floor(Math.random() * audioUrls.length);
+      let newAudio = null;
+      let newAttempts = 0;
+
+      // Thử tải bài mới cho đến khi thành công hoặc hết danh sách
+      while (newAttempts < audioUrls.length && !newAudio) {
+        newAudio = await loadTrack(audioUrls[currentTrackIndex]);
+        newAttempts += 1;
+        if (!newAudio) {
+          currentTrackIndex = (currentTrackIndex + 1) % audioUrls.length;
+        }
+      }
+
+      if (newAudio) {
+        audioEl = newAudio;
+        if (isPlay) {
+          play();
+        }
+      } else {
+        console.warn("No more audio tracks available");
+      }
+    });
 
     // Sự kiện khi mở undangan
     document.addEventListener("undangan.open", () => {
@@ -113,24 +153,20 @@ export const audio = (() => {
     // Tạm dừng khi offline
     window.addEventListener("offline", pause);
 
-    // Xử lý sự kiện click để phát/tạm dừng
+    // Xử lý click để phát/tạm dừng
     if (music) {
       music.addEventListener("click", () => (isPlay ? pause() : play()));
     }
   };
 
   /**
+   * Khởi tạo
    * @returns {object}
    */
   const init = () => {
     progress.add();
-
-    return {
-      load,
-    };
+    return { load };
   };
 
-  return {
-    init,
-  };
+  return { init };
 })();

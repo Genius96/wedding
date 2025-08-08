@@ -1,24 +1,12 @@
 import { progress } from "./progress.js";
-import { util } from "../../common/util.js";
-import { cache } from "../../connection/cache.js";
-import {
-  HTTP_GET,
-  request,
-  HTTP_STATUS_OK,
-  HTTP_STATUS_PARTIAL_CONTENT,
-} from "../../connection/request.js";
 
 export const video = (() => {
   /**
-   * @type {ReturnType<typeof cache>|null}
-   */
-  let c = null;
-
-  /**
+   * Tải video
    * @returns {Promise<void>}
    */
   const load = () => {
-    const wrap = document.getElementById("video-love-stroy");
+    const wrap = document.getElementById("video-love-story");
     if (!wrap || !wrap.hasAttribute("data-src")) {
       wrap?.remove();
       progress.complete("video", true);
@@ -47,131 +35,51 @@ export const video = (() => {
       es.forEach((e) => (e.isIntersecting ? vid.play() : vid.pause()))
     );
 
-    /**
-     * @param {Response} res
-     * @returns {Promise<Response>}
-     */
-    const resToVideo = (res) => {
+    vid.src = src;
+    wrap.appendChild(vid);
+
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        console.error("Timeout loading video:", src);
+        progress.invalid("video");
+        reject(new Error(`Timeout loading video: ${src}`));
+      }, 5000); // Timeout sau 5 giây
+
       vid.addEventListener(
         "loadedmetadata",
         () => {
+          console.log("Video metadata loaded:", src);
+          clearTimeout(timeout);
           vid.style.removeProperty("height");
-          document.getElementById("video-love-stroy-loading")?.remove();
+          document.getElementById("video-love-story-loading")?.remove();
+          progress.complete("video");
+          observer.observe(vid);
+          resolve();
         },
         { once: true }
       );
 
-      return res
-        .clone()
-        .blob()
-        .then((b) => {
-          vid.src = URL.createObjectURL(b);
-          return res;
-        });
-    };
-
-    /**
-     * @returns {Promise<Response>}
-     */
-    const fetchBasic = () => {
-      const bar = document.getElementById("progress-bar-video-love-stroy");
-      const inf = document.getElementById("progress-info-video-love-stroy");
-
-      return request(HTTP_GET, src)
-        .withCancel(
-          new Promise((re) =>
-            vid.addEventListener("undangan.video.prefetch", re, { once: true })
-          )
-        )
-        .default({ Range: "bytes=0-1" })
-        .then((res) => {
-          vid.dispatchEvent(new Event("undangan.video.prefetch"));
-
-          if (res.status === HTTP_STATUS_OK) {
-            vid.preload = "none";
-
-            vid.src = util.escapeHtml(src);
-            wrap.appendChild(vid);
-
-            return Promise.resolve();
-          }
-
-          if (res.status !== HTTP_STATUS_PARTIAL_CONTENT) {
-            throw new Error("failed to fetch video");
-          }
-
-          vid.addEventListener("error", () => progress.invalid("video"), {
-            once: true,
-          });
-          const loaded = new Promise((r) =>
-            vid.addEventListener("loadedmetadata", r, { once: true })
-          );
-
-          vid.src = util.escapeHtml(src);
-          wrap.appendChild(vid);
-
-          return loaded;
-        })
-        .then(() => {
-          progress.complete("video");
-
-          const height =
-            vid.getBoundingClientRect().width *
-            (vid.videoHeight / vid.videoWidth);
-          vid.style.height = `${height}px`;
-
-          return request(HTTP_GET, vid.src)
-            .withProgressFunc((a, b) => {
-              const result = Number((a / b) * 100).toFixed(0) + "%";
-
-              bar.style.width = result;
-              inf.innerText = result;
-            })
-            .withRetry()
-            .default()
-            .then(resToVideo)
-            .catch((err) => {
-              bar.style.backgroundColor = "red";
-              inf.innerText = `Error loading video`;
-              console.error(err);
-            })
-            .finally(() => observer.observe(vid));
-        });
-    };
-
-    if (!window.isSecureContext) {
-      return fetchBasic();
-    }
-
-    return c.has(src).then((res) => {
-      if (!res) {
-        return c
-          .del(src)
-          .then(fetchBasic)
-          .then((r) => c.set(src, r));
-      }
-
-      progress.complete("video");
-      return resToVideo(res).finally(() => {
-        wrap.appendChild(vid);
-        observer.observe(vid);
-      });
+      vid.addEventListener(
+        "error",
+        () => {
+          console.error("Error loading video:", src);
+          clearTimeout(timeout);
+          progress.invalid("video");
+          reject(new Error(`Failed to load video: ${src}`));
+        },
+        { once: true }
+      );
     });
   };
 
   /**
+   * Khởi tạo
    * @returns {object}
    */
   const init = () => {
     progress.add();
-    c = cache("video").withForceCache();
-
-    return {
-      load,
-    };
+    return { load };
   };
 
-  return {
-    init,
-  };
+  return { init };
 })();
