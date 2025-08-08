@@ -43,7 +43,7 @@ export const video = (() => {
         console.error("Timeout loading video:", src);
         progress.invalid("video");
         reject(new Error(`Timeout loading video: ${src}`));
-      }, 5000); // Timeout sau 5 giây
+      }, 30000); // Timeout sau 5 giây
 
       vid.addEventListener(
         "loadedmetadata",

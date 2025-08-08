@@ -15,7 +15,7 @@ export const audio = (() => {
       const timeout = setTimeout(() => {
         console.warn(`Timeout loading audio: ${url}`);
         resolve(null); // Bỏ qua bài hát nếu timeout
-      }, 10000); // Timeout sau 5 giây
+      }, 15000); // Timeout sau 5 giây
 
       const audioElement = new Audio(url);
       audioElement.loop = false;

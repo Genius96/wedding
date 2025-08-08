@@ -61,7 +61,7 @@ export const progress = (() => {
         console.warn("Progress timeout");
         invalid("timeout");
       }
-    }, 15000);
+    }, 50000);
   };
 
   return {
