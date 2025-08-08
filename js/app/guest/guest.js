@@ -1,4 +1,4 @@
-import { video } from "./video.js";
+// import { video } from "./video.js";
 import { image } from "./image.js";
 import { audio } from "./audio.js";
 import { progress } from "./progress.js";
@@ -361,7 +361,7 @@ export const guest = (() => {
     config = storage("config");
     information = storage("information");
 
-    const vid = video.init();
+    // const vid = video.init();
     const img = image.init();
     const aud = audio.init();
     const lib = loaderLibs();
@@ -386,7 +386,7 @@ export const guest = (() => {
         ?.closest("li.nav-item")
         ?.remove();
 
-      vid.load();
+      // vid.load();
       img.load();
       aud.load();
       lib.load({
@@ -417,7 +417,7 @@ export const guest = (() => {
               img.load();
             }
 
-            vid.load();
+            // vid.load();
             aud.load();
             lib.load({ confetti: data.is_confetti_animation });
 
