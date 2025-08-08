@@ -30,6 +30,9 @@ export const video = (() => {
     vid.disableRemotePlayback = true;
     vid.disablePictureInPicture = true;
     vid.controlsList = "noremoteplayback nodownload noplaybackrate";
+    // Sử dụng transform để dịch chuyển video, đảm bảo hiển thị phần giữa
+    vid.style.cssText =
+      "position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform: translateY(-40%) scale(1); transform-origin: center; border-radius: 0.5rem;";
 
     const observer = new IntersectionObserver((es) =>
       es.forEach((e) => (e.isIntersecting ? vid.play() : vid.pause()))
@@ -43,7 +46,7 @@ export const video = (() => {
         console.error("Timeout loading video:", src);
         progress.invalid("video");
         reject(new Error(`Timeout loading video: ${src}`));
-      }, 30000); // Timeout sau 5 giây
+      }, 30000); // Timeout sau 30 giây
 
       vid.addEventListener(
         "loadedmetadata",
