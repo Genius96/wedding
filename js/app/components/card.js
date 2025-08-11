@@ -260,7 +260,7 @@ export const card = (() => {
         )}" id="content-${c.uuid}">${data}</p>
         ${
           moreMaxLength
-            ? `<p class="d-block mb-2 mt-0 mx-0 p-0"><a class="text-theme-auto" role="button" style="font-size: 0.85rem;" data-show="false" onclick="undangan.comment.showMore(this, '${c.uuid}')">Selengkapnya</a></p>`
+            ? `<p class="d-block mb-2 mt-0 mx-0 p-0"><a class="text-theme-auto" role="button" style="font-size: 0.85rem;" data-show="false" onclick="undangan.comment.showMore(this, '${c.uuid}')">Đọc thêm</a></p>`
             : ""
         }`
       );

@@ -128,7 +128,7 @@ export const comment = (() => {
         )
       )
     );
-    anchor.innerText = isCollapsed ? "Sebagian" : "Selengkapnya";
+    anchor.innerText = isCollapsed ? "Thu gọn" : "Đọc thêm";
     anchor.setAttribute("data-show", isCollapsed ? "true" : "false");
   };
 
